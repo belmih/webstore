@@ -1,4 +1,4 @@
-package ru.belmih.webstore;
+package ru.belmih.webstore.controllers;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -10,14 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
+//import org.springframework.objenesis.strategy.InstantiatorStrategy;
 
 /**
  * Handles requests for the application home page.
  */
+@Repository
 @Controller
 public class HomeController {
 	
@@ -26,7 +29,8 @@ public class HomeController {
 	
 	@Autowired
 	HomeController(DataSource dataSource){
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		logger.debug("In HomeController(DataSource dataSource)");
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
 	/**
@@ -34,7 +38,7 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Locale locale, Model model) {
-		logger.info("Welcome home! The client locale is {}.", locale);
+		logger.debug("Welcome home! The client locale is {}.", locale);
 		
 		Date date = new Date();
 		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale);
@@ -49,10 +53,13 @@ public class HomeController {
     
 	@RequestMapping(value = "/test/", method = RequestMethod.GET)
 	public String base() {
-		logger.info("In base();");
-		jdbcTemplate.execute("CREATE TABLE customers1(id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
+		logger.debug("In base();");
+		int rowCount = this.jdbcTemplate.queryForObject("select count(*) from users", Integer.class);
+		logger.debug(Integer.toString(rowCount));
+		//jdbcTemplate.execute("CREATE TABLE customers1(id SERIAL, first_name VARCHAR(255), last_name VARCHAR(255))");
 		return "base";
 	}
+	
 	
 	
 }
